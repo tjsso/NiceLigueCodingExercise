@@ -1,5 +1,6 @@
-package com.niceligue.model;
+package niceligue.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,6 +23,7 @@ public class Team {
     private String abbreviation;
     private Double budget;
 
+    @JsonIgnoreProperties("teams")
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
         name = "team_players",

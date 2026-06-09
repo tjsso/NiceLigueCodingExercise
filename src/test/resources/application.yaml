@@ -1,13 +1,13 @@
 spring:
   datasource:
-    url: "jdbc:h2:file:./data/nice_league_db;DB_CLOSE_DELAY=-1"
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
     driverClassName: org.h2.Driver
     username: sa
     password: password
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
   h2:
     console:
       enabled: true

@@ -1,8 +1,10 @@
-package com.niceligue.controller;
+package niceligue.controller;
 
-import com.niceligue.model.Player;
-import com.niceligue.repository.PlayerRepository;
 import java.util.List;
+import niceligue.model.Player;
+import niceligue.repository.PlayerRepository;
+import niceligue.service.PlayerService;
+import niceligue.service.PlayerTeamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,22 +22,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlayerController {
 
     @Autowired
-    private PlayerRepository playerRepository;
+    private PlayerService playerService;
+
+    @Autowired
+    private PlayerTeamService playerTeamService;
 
     @GetMapping
     public List<Player> getAllPlayers() {
-        return playerRepository.findAll();
+        return playerService.findAll();
     }
 
     @PostMapping
-    public Player createPlayer(@RequestBody Player player) {
-        // Note: Team association is handled in TeamController or can be set manually here
-        return playerRepository.save(player);
+    public ResponseEntity<Player> createPlayer(@RequestBody Player player) {
+        return ResponseEntity.ok(playerService.save(player));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Player> getPlayerById(@PathVariable Long id) {
-        return playerRepository
+        return playerService
             .findById(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
@@ -48,31 +52,20 @@ public class PlayerController {
     ) {
         // TODO - Probably replace with separate methods for updating name, position, and team separately. (team in team management probably?)
         return null;
-        // return playerRepository
-        //     .findById(id)
-        //     .map(player -> {
-        //         player.setName(playerDetails.getName());
-        //         player.setPosition(playerDetails.getPosition());
-        //         // Team association would need to be handled here if changed via this endpoint
-        //         if (!player.playsForTeam(playerDetails.getTeams())) {
-        //             player.setTeam(playerDetails.getTeam());
-        //         }
-        //         return ResponseEntity.ok(playerRepository.save(player));
-        //     })
-        //     .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
-        if (playerRepository.existsById(id)) {
-            playerRepository.deleteById(id);
+        if (playerService.existsById(id)) {
+            playerTeamService.removePlayerFromAllTeams(id);
+            playerService.deleteById(id);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Player>> search(@RequestParam String pattern) {
-        return ResponseEntity.ok(playerRepository.findByNameLike(pattern));
+    public ResponseEntity<List<Player>> search(@RequestParam String name) {
+        return ResponseEntity.ok(playerService.searchByNameContaining(name));
     }
 }

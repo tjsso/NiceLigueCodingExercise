@@ -1,12 +1,11 @@
-package com.niceligue.model;
+package niceligue.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
@@ -23,12 +22,8 @@ public class Player {
     private String name;
     private String position;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "player_teams",
-        joinColumns = @JoinColumn(name = "player_id"),
-        inverseJoinColumns = @JoinColumn(name = "team_name")
-    )
+    @JsonIgnoreProperties("players")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "players")
     private Set<Team> teams = new HashSet<>();
 
     public Player() {}

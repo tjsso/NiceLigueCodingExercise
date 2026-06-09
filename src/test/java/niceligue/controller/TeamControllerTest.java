@@ -1,4 +1,4 @@
-package com.niceligue.controller;
+package niceligue.controller;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasEntry;
@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.niceligue.model.Player;
-import com.niceligue.model.Team;
+import niceligue.model.Player;
+import niceligue.model.Team;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,10 +31,10 @@ public class TeamControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private com.niceligue.repository.TeamRepository teamRepository;
+    private niceligue.repository.TeamRepository teamRepository;
 
     @Autowired
-    private com.niceligue.repository.PlayerRepository playerRepository;
+    private niceligue.repository.PlayerRepository playerRepository;
 
     @BeforeEach
     void setup() {

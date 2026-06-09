@@ -1,0 +1,17 @@
+/target/
+*.log
+*.txt
+
+# Build output & IDE settings
+.gradle/
+build/
+.settings/
+.classpath
+.project
+.factorypath
+
+# IDE-specific folders
+.idea/
+.vscode/
+.zed/
+*.iml
