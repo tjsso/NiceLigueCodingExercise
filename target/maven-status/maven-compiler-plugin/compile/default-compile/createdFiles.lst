@@ -1,0 +1,7 @@
+com/niceligue/repository/TeamRepository.class
+com/niceligue/repository/PlayerRepository.class
+com/niceligue/controller/PlayerController.class
+com/niceligue/model/Player.class
+com/niceligue/NiceLigueCodingExerciseApplication.class
+com/niceligue/controller/TeamController.class
+com/niceligue/model/Team.class
