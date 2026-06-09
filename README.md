@@ -4,8 +4,8 @@
 1 hr
 1 hr
 2hr
-
-total: 8.5 hours
+1hr 
+total: 9.5 hours
 
 ## Thought process:
 
@@ -55,3 +55,9 @@ There were two fixes to this:
 2. use @JsonIgnoreProperties("teams"/"players") // When serializing a ManyToMany, ignore their relevant lists
 
 **During investigations of above, found issues because H2 DB is persistent. We do not want it to be for JUnit Tests. Therefore created src/test/resources/application.yaml** to override the H2 DB persistence and make it an in-memory DB only for JUnit tests.
+
+## LLM (AI) usage
+The aims of this project are not to automatically generate code using an LLM. However in today's landscape it is hard to avoid them. Therefore this section highlights any specific usages of LLM "AI" to get me an answer.
+| Problem      | Usage/Output |
+| ----------- | ----------- |
+| When thinking about how to "host" my solution. I remembered previously using GitHub Codespaces to prototype NodeJS web apps for prototyping. However I have never personally set this up. I attempted to follow [this documentation](https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/adding-a-dev-container-configuration/setting-up-your-java-project-for-codespaces)      | I ended up turn to an LLM (Gemini Flash) for assistance with the creation of the devcontainer.json. I had problems with the container not compiling specific versions of java and it also informed me how to `reload container` after updating the devcontainer.json file. For all intents and purposes .devcontainer/ folder and contents can be considered AI generated.

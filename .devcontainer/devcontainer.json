@@ -1,0 +1,40 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/java
+
+// Access swagger @ https://fictional-chainsaw-54qw949grw5cv4r6-8080.app.github.dev/swagger-ui/index.html
+// |-> Double check codespaces name URL.
+{
+  "name": "Java",
+  "image": "mcr.microsoft.com/devcontainers/java:3-21-trixie",
+
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installMaven": "true",
+      "mavenVersion": "3.8.6",
+      "installGradle": "false",
+    },
+    "ghcr.io/devcontainers-extra/features/springboot-sdkman:2": {},
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["vscjava.vscode-java-pack", "redhat.vscode-xml"],
+    },
+  },
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "Spring Boot API",
+      "onAutoForward": "openBrowser",
+    },
+  },
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "java -version",
+
+  // Configure tool-specific properties.
+  // "customizations": {},
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
+}
