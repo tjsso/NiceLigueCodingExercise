@@ -192,7 +192,7 @@ public class TeamControllerTest {
             "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": -100.0}"
           )
       )
-      .andExpect(status().isNotAcceptable());
+      .andExpect(status().isBadRequest());
 
     // Null Budget -> Should fail with 400 Bad Request
     mockMvc

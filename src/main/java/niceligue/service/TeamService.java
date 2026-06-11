@@ -40,7 +40,6 @@ public class TeamService {
   @Transactional(readOnly = true)
   public Optional<Team> findById(String name) {
     return teamRepository.findById(name).map(team -> {
-      // Load the lazy collection forcing Hibernate to fetch it
       if (team.getPlayers() != null) {
         team.getPlayers().size();
       }
@@ -71,6 +70,8 @@ public class TeamService {
         p.getTeams().add(team);
         processedPlayers.add(p);
       }
+      // Fix: clear out old detached references from request body before adding processed ones
+      team.getPlayers().clear();
       team.getPlayers().addAll(processedPlayers);
     }
 

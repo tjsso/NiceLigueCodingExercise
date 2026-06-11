@@ -70,7 +70,7 @@ public class TeamController {
   @PutMapping("/{name}")
   public ResponseEntity<Team> updateTeam(
     @PathVariable String name,
-    @RequestBody Team teamDetails
+    @Valid @RequestBody Team teamDetails
   ) {
     return ResponseEntity.ok(teamService.updateTeam(name, teamDetails));
   }

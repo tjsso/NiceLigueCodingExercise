@@ -10,6 +10,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.util.HashSet;
 import java.util.Objects;
@@ -26,6 +27,7 @@ public class Team {
   @NotEmpty(message = "Any team must have an abbreviation/acronym")
   private String abbreviation;
 
+  @NotNull
   @PositiveOrZero(message = "Budget must be zero or positive")
   private Double budget;
 
@@ -37,6 +39,10 @@ public class Team {
     inverseJoinColumns = @JoinColumn(name = "player_id")
   )
   private Set<Player> players = new HashSet<>();
+
+  public Team() {
+    // JPA requires default constructor
+  }
 
   public Team(String name, String abbreviation, Double budget) {
     this.name = name;
