@@ -9,6 +9,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -17,87 +20,86 @@ import java.util.Set;
 @Table(name = "teams")
 public class Team {
 
-    @Id
-    private String name;
+  @Id
+  private String name;
 
-    private String abbreviation;
-    private Double budget;
+  private String abbreviation;
 
-    @JsonIgnoreProperties("teams")
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-        name = "team_players",
-        joinColumns = @JoinColumn(name = "team_name"),
-        inverseJoinColumns = @JoinColumn(name = "player_id")
-    )
-    private Set<Player> players = new HashSet<>();
+  @PositiveOrZero(message = "Budget must be zero or positive")
+  private Double budget;
 
-    public Team() {}
+  @JsonIgnoreProperties("teams")
+  @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinTable(name = "team_players", joinColumns = @JoinColumn(name = "team_name"), inverseJoinColumns = @JoinColumn(name = "player_id"))
+  private Set<Player> players = new HashSet<>();
 
-    public Team(String name, String abbreviation, Double budget) {
-        this.name = name;
-        this.abbreviation = abbreviation;
-        this.budget = budget;
-    }
+  public Team() {
+  }
 
-    public String getName() {
-        return name;
-    }
+  public Team(String name, String abbreviation, Double budget) {
+    this.name = name;
+    this.abbreviation = abbreviation;
+    this.budget = budget;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getAbbreviation() {
-        return abbreviation;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setAbbreviation(String abbreviation) {
-        this.abbreviation = abbreviation;
-    }
+  public String getAbbreviation() {
+    return abbreviation;
+  }
 
-    public Double getBudget() {
-        return budget;
-    }
+  public void setAbbreviation(String abbreviation) {
+    this.abbreviation = abbreviation;
+  }
 
-    public void setBudget(Double budget) {
-        this.budget = budget;
-    }
+  public Double getBudget() {
+    return budget;
+  }
 
-    public Set<Player> getPlayers() {
-        return players;
-    }
+  public void setBudget(Double budget) {
+    this.budget = budget;
+  }
 
-    public void setPlayers(Set<Player> players) {
-        this.players = players;
-    }
+  public Set<Player> getPlayers() {
+    return players;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Team team = (Team) o;
-        return Objects.equals(name, team.name);
-    }
+  public void setPlayers(Set<Player> players) {
+    this.players = players;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    Team team = (Team) o;
+    return Objects.equals(name, team.name);
+  }
 
-    @Override
-    public String toString() {
-        return (
-            "Team{" +
-            "name='" +
-            name +
-            '\'' +
-            ", abbreviation='" +
-            abbreviation +
-            '\'' +
-            ", budget=" +
-            budget +
-            '}'
-        );
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(name);
+  }
+
+  @Override
+  public String toString() {
+    return ("Team{" +
+        "name='" +
+        name +
+        '\'' +
+        ", abbreviation='" +
+        abbreviation +
+        '\'' +
+        ", budget=" +
+        budget +
+        '}');
+  }
 }

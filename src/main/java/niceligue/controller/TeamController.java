@@ -20,46 +20,45 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/teams")
 public class TeamController {
 
-    @Autowired
-    private TeamService teamService;
+  @Autowired
+  private TeamService teamService;
 
-    @Autowired
-    private PlayerTeamService playerTeamService;
+  @Autowired
+  private PlayerTeamService playerTeamService;
 
-    @PostMapping
-    public Team createTeam(@RequestBody Team team) {
-        return teamService.createTeam(team);
-    }
+  @PostMapping
+  public ResponseEntity<Team> createTeam(@RequestBody Team team) {
+    return ResponseEntity.ok(teamService.createTeam(team));
+  }
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<Void> deleteTeam(@PathVariable String name) {
-        teamService.deleteByName(name);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/{name}")
+  public ResponseEntity<Void> deleteTeam(@PathVariable String name) {
+    teamService.deleteByName(name);
+    return ResponseEntity.noContent().build();
+  }
 
-    @GetMapping
-    public List<Team> getAllTeams() {
-        return teamService.findAll();
-    }
+  @GetMapping
+  public List<Team> getAllTeams() {
+    return teamService.findAll();
+  }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<Team> getTeamByName(@PathVariable String name) {
-        return teamService
-            .findById(name)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-    }
+  @GetMapping("/{name}")
+  public ResponseEntity<Team> getTeamByName(@PathVariable String name) {
+    return teamService
+        .findById(name)
+        .map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
+  }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<Team>> search(@RequestParam String pattern) {
-        return ResponseEntity.ok(teamService.search(pattern));
-    }
+  @GetMapping("/search")
+  public ResponseEntity<List<Team>> search(@RequestParam String pattern) {
+    return ResponseEntity.ok(teamService.search(pattern));
+  }
 
-    @PutMapping("/{name}")
-    public ResponseEntity<Team> updateTeam(
-        @PathVariable String name,
-        @RequestBody Team teamDetails
-    ) {
-        return ResponseEntity.ok(teamService.updateTeam(name, teamDetails));
-    }
+  @PutMapping("/{name}")
+  public ResponseEntity<Team> updateTeam(
+      @PathVariable String name,
+      @RequestBody Team teamDetails) {
+    return ResponseEntity.ok(teamService.updateTeam(name, teamDetails));
+  }
 }
