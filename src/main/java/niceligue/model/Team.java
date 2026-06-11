@@ -9,9 +9,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.PositiveOrZero;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -21,8 +20,10 @@ import java.util.Set;
 public class Team {
 
   @Id
+  @NotEmpty(message = "Any team must have a name")
   private String name;
 
+  @NotEmpty(message = "Any team must have an abbreviation/acronym")
   private String abbreviation;
 
   @PositiveOrZero(message = "Budget must be zero or positive")
@@ -30,11 +31,12 @@ public class Team {
 
   @JsonIgnoreProperties("teams")
   @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinTable(name = "team_players", joinColumns = @JoinColumn(name = "team_name"), inverseJoinColumns = @JoinColumn(name = "player_id"))
+  @JoinTable(
+    name = "team_players",
+    joinColumns = @JoinColumn(name = "team_name"),
+    inverseJoinColumns = @JoinColumn(name = "player_id")
+  )
   private Set<Player> players = new HashSet<>();
-
-  public Team() {
-  }
 
   public Team(String name, String abbreviation, Double budget) {
     this.name = name;
@@ -76,10 +78,8 @@ public class Team {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
     Team team = (Team) o;
     return Objects.equals(name, team.name);
   }
@@ -91,15 +91,17 @@ public class Team {
 
   @Override
   public String toString() {
-    return ("Team{" +
-        "name='" +
-        name +
-        '\'' +
-        ", abbreviation='" +
-        abbreviation +
-        '\'' +
-        ", budget=" +
-        budget +
-        '}');
+    return (
+      "Team{" +
+      "name='" +
+      name +
+      '\'' +
+      ", abbreviation='" +
+      abbreviation +
+      '\'' +
+      ", budget=" +
+      budget +
+      '}'
+    );
   }
 }

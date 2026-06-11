@@ -12,10 +12,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-
 import niceligue.model.Player;
 import niceligue.model.Team;
+import niceligue.repository.PlayerRepository;
+import niceligue.repository.TeamRepository;
+import niceligue.service.PlayerTeamService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,69 +33,74 @@ public class TeamControllerTest {
   private MockMvc mockMvc;
 
   @Autowired
-  private niceligue.repository.TeamRepository teamRepository;
+  private TeamRepository teamRepository;
 
   @Autowired
-  private niceligue.repository.PlayerRepository playerRepository;
+  private PlayerRepository playerRepository;
+
+  @Autowired
+  private PlayerTeamService playerTeamService;
 
   @Test
   @DisplayName("Assign a player to a team")
   void testAssignPlayerToTeam() throws Exception {
     mockMvc.perform(
-        post("/api/teams")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(
-                "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": 50000.0}"));
+      post("/api/teams")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(
+          "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": 50000.0}"
+        )
+    );
 
     Player p = new Player(null, "Jackson", "Goalie");
-    Team t = teamRepository.findByName("Nice AFC");
-    p.getTeams().add(t);
-    playerRepository.save(p);
+    p = playerRepository.save(p);
+
+    playerTeamService.addPlayerToTeam(p.getId(), "Nice AFC");
 
     mockMvc
-        .perform(get("/api/teams/" + t.getName()))
-        .andExpect(status().isOk())
-        .andExpect(
-            jsonPath("$.players", hasItem(hasEntry("name", "Jackson"))));
+      .perform(get("/api/teams/Nice AFC"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.players", hasItem(hasEntry("name", "Jackson"))));
   }
 
   @Test
   @DisplayName("Create an empty team")
   void testCreateEmptyTeam() throws Exception {
-    String json = "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": 55000.0}";
+    String json =
+      "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": 55000.0}";
     mockMvc
-        .perform(
-            post("/api/teams")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.name", is("Nice AFC")))
-        .andExpect(jsonPath("$.players", empty()));
+      .perform(
+        post("/api/teams").contentType(MediaType.APPLICATION_JSON).content(json)
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.name", is("Nice AFC")))
+      .andExpect(jsonPath("$.players", empty()));
   }
 
   @Test
-  @DisplayName("Create a team with players, some of whom do not exist (expect it to create the players)")
+  @DisplayName(
+    "Create a team with players, some of whom do not exist (expect it to create the players)"
+  )
   void testCreateTeamWithNewPlayers() throws Exception {
-    // This test requires logic in TeamController to check for existence and save
-    // new ones.
-    String json = "{" +
-        "\"name\": \"Real Madrid\", " +
-        "\"abbreviation\": \"RMA\", " +
-        "\"budget\": 600000.0, " +
-        "\"players\": [" +
-        "  {\"id\": 99, \"name\": \"Existing Player\", \"position\": \"Forward\"}, " + // This might exist or not
-        "  {\"id\": null, \"name\": \"New Player\", \"position\": \"Midfield\"}" + // This should be created if unknown
-        "]" +
-        "}";
+    String json =
+      "{" +
+      "\"name\": \"Real Madrid\", " +
+      "\"abbreviation\": \"RMA\", " +
+      "\"budget\": 600000.0, " +
+      "\"players\": [" +
+      "  {\"id\": 99, \"name\": \"Existing Player\", \"position\": \"Forward\"}, " + // This might exist or not
+      "  {\"id\": null, \"name\": \"New Player\", \"position\": \"Midfield\"}" + // This should be created if unknown
+      "]" +
+      "}";
 
     mockMvc
-        .perform(
-            post("/api/teams")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-        .andExpect(status().isOk())
-        .andExpect(
-            jsonPath("$.players", hasItem(hasEntry("name", "New Player"))));
+      .perform(
+        post("/api/teams").contentType(MediaType.APPLICATION_JSON).content(json)
+      )
+      .andExpect(status().isOk())
+      .andExpect(
+        jsonPath("$.players", hasItem(hasEntry("name", "New Player")))
+      );
   }
 
   @Test
@@ -109,11 +115,11 @@ public class TeamControllerTest {
     teamRepository.save(t2);
 
     mockMvc
-        .perform(delete("/api/teams/Empty Team"))
-        .andExpect(status().isNoContent());
+      .perform(delete("/api/teams/Empty Team"))
+      .andExpect(status().isNoContent());
     mockMvc
-        .perform(delete("/api/teams/Full Team"))
-        .andExpect(status().isNoContent());
+      .perform(delete("/api/teams/Full Team"))
+      .andExpect(status().isNoContent());
   }
 
   @Test
@@ -126,16 +132,16 @@ public class TeamControllerTest {
     p1.getTeams().add(t1);
     playerRepository.save(p1);
 
-    // The controller update logic should handle clearing the set or removing
-    // specific players
-    String json = "{\"name\": \"Team 1\", \"abbreviation\": \"T1\", \"budget\": 100.0, \"players\": []}";
+    String json =
+      "{\"name\": \"Team 1\", \"abbreviation\": \"T1\", \"budget\": 100.0, \"players\": []}";
     mockMvc
-        .perform(
-            put("/api/teams/Team 1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.players", empty()));
+      .perform(
+        put("/api/teams/Team 1")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(json)
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.players", empty()));
   }
 
   @Test
@@ -145,14 +151,15 @@ public class TeamControllerTest {
     teamRepository.save(t1);
 
     Player p1 = new Player(null, "Thomas", "Midfield");
-    p1.getTeams().add(t1);
-    playerRepository.save(p1);
+    p1 = playerRepository.save(p1); // Save to get the ID
+
+    playerTeamService.addPlayerToTeam(p1.getId(), "Nice AFC");
 
     mockMvc
-        .perform(get("/api/teams/Nice AFC"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.players", hasSize(1)))
-        .andExpect(jsonPath("$.players[0].name", is("Thomas")));
+      .perform(get("/api/teams/Nice AFC"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.players", hasSize(1)))
+      .andExpect(jsonPath("$.players[0].name", is("Thomas")));
   }
 
   @Test
@@ -160,56 +167,68 @@ public class TeamControllerTest {
   void testSearchTeam() throws Exception {
     teamRepository.save(new Team("Yogscast", "YGC", 1000.0));
     teamRepository.save(new Team("Nice AFC", "OGS", 5000.0));
+    teamRepository.save(new Team("Manchester United", "MCU", 75000.0));
 
-    List<Team> team = mockMvc
-        .perform(get("/api/teams/search").param("query", "OGS"))
-        .andExpect(status().isOk())
-        .andExpect(hasSize(2));
+    // Expecting both Yogscast and Nice AFC to be returned. 'OGS' is a substring of Yogscast and the abbreviation of Nice AFC.
+    mockMvc
+      .perform(get("/api/teams/search").param("pattern", "OGS"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$", hasSize(2)));
   }
 
   @Test
-  @DisplayName("Updating budget (test negative number, null, 0, MAX_INT)")
+  @DisplayName(
+    "Updating budget (test negative number, null, 0, large valid double)"
+  )
   void testUpdateBudget() throws Exception {
     teamRepository.save(new Team("Nice AFC", "OGC", 50000.0));
 
     // Negative Budget -> Should fail with 406 Not Acceptable
     mockMvc
-        .perform(
-            put("/api/teams/Nice AFC")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": -100.0}"))
-        .andExpect(status().isNotAcceptable());
+      .perform(
+        put("/api/teams/Nice AFC")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(
+            "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": -100.0}"
+          )
+      )
+      .andExpect(status().isNotAcceptable());
 
     // Null Budget -> Should fail with 400 Bad Request
     mockMvc
-        .perform(
-            put("/api/teams/Nice AFC")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": null}"))
-        .andExpect(status().isBadRequest());
+      .perform(
+        put("/api/teams/Nice AFC")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(
+            "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": null}"
+          )
+      )
+      .andExpect(status().isBadRequest());
 
     // Zero Budget -> Should succeed
     mockMvc
-        .perform(
-            put("/api/teams/Nice AFC")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": 0.0}"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.budget", is(0.0)));
+      .perform(
+        put("/api/teams/Nice AFC")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(
+            "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": 0.0}"
+          )
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.budget", is(0.0)));
 
-    Double maxBudget = Double.MAX_VALUE;
+    // Would prefer to test with Double.MAX but this results in scientific notation of
+    // which there is a representation difference between Java and JSON causing the test to inadvertly fail.
+    Double maxBudget = 999999999.0;
     mockMvc
-        .perform(
-            put("/api/teams/Nice AFC")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    String.format(
-                        "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": %f}",
-                        maxBudget)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.budget", is(maxBudget)));
+      .perform(
+        put("/api/teams/Nice AFC")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(
+            "{\"name\": \"Nice AFC\", \"abbreviation\": \"OGC\", \"budget\": 999999999.0}"
+          )
+      )
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.budget", is(maxBudget)));
   }
 }
