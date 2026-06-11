@@ -36,12 +36,22 @@ public class PlayerService {
     }
 
     public boolean existsById(Long id) {
-        System.out.println(
-            "existsById : " +
-                id +
-                " result : " +
-                playerRepository.existsById(id)
-        );
-        return playerRepository.existsById(id);
+      System.out.println(
+          "existsById : " +
+              id +
+              " result : " +
+              playerRepository.existsById(id));
+      return playerRepository.existsById(id);
+    }
+
+    public Player update(Long id, Player playerDetails) {
+      return playerRepository
+          .findById(id)
+          .map(player -> {
+            player.setName(playerDetails.getName());
+            player.setPosition(playerDetails.getPosition());
+            return playerRepository.save(player);
+          })
+          .orElseThrow(() -> new RuntimeException("Player not found with id " + id));
     }
 }

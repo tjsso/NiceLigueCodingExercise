@@ -2,7 +2,6 @@ package niceligue.controller;
 
 import java.util.List;
 import niceligue.model.Player;
-import niceligue.repository.PlayerRepository;
 import niceligue.service.PlayerService;
 import niceligue.service.PlayerTeamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,20 +47,18 @@ public class PlayerController {
     @PutMapping("/{id}")
     public ResponseEntity<Player> updatePlayer(
         @PathVariable Long id,
-        @RequestBody Player playerDetails
-    ) {
-        // TODO - Probably replace with separate methods for updating name, position, and team separately. (team in team management probably?)
-        return null;
+        @RequestBody Player playerDetails) {
+      return ResponseEntity.ok(playerService.update(id, playerDetails));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
-        if (playerService.existsById(id)) {
-            playerTeamService.removePlayerFromAllTeams(id);
-            playerService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+      if (playerService.existsById(id)) {
+        playerTeamService.removePlayerFromAllTeams(id);
+        playerService.deleteById(id);
+        return ResponseEntity.noContent().build();
+      }
+      return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/search")
