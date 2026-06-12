@@ -20,31 +20,38 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/teams")
+@Tag(name = "Teams", description = "Endpoints for managing teams in the league")
 public class TeamController {
 
   @Autowired
   private TeamService teamService;
 
   @PostMapping
+  @Operation(summary = "Create a new team", description = "Registers a new team in the system")
   public ResponseEntity<Team> createTeam(@Valid @RequestBody Team team) {
     return ResponseEntity.ok(teamService.createTeam(team));
   }
 
   @DeleteMapping("/{name}")
+  @Operation(summary = "Delete a team", description = "Removes a team from the system by its name")
   public ResponseEntity<Void> deleteTeam(@PathVariable String name) {
     teamService.deleteByName(name);
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping
+  @Operation(summary = "Get all teams with pagination", description = "Retrieves a paginated and sorted list of all teams")
   public ResponseEntity<Page<Team>> getAllTeams(
-    @RequestParam(defaultValue = "0") int page,
-    @RequestParam(defaultValue = "10") int size,
-    @RequestParam(defaultValue = "name") String sortBy,
-    @RequestParam(defaultValue = "asc") String sortDir
-  ) {
+    @Parameter(description = "Page number (0-indexed)") @RequestParam(defaultValue = "0") int page,
+    @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+    @Parameter(description = "Field to sort by") @RequestParam(defaultValue = "name") String sortBy,
+    @Parameter(description = "Sort direction (asc/desc)") @RequestParam(defaultValue = "asc") String sortDir) {
     // Objective: The list will be paginated and can be sorted server-side (by team name, acronym, and budget).
     Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
       ? Sort.by(sortBy).ascending()
@@ -55,6 +62,7 @@ public class TeamController {
   }
 
   @GetMapping("/{name}")
+  @Operation(summary = "Get team by name", description = "Retrieves the details of a specific team by its name")
   public ResponseEntity<Team> getTeamByName(@PathVariable String name) {
     return teamService
       .findById(name)
@@ -63,15 +71,17 @@ public class TeamController {
   }
 
   @GetMapping("/search")
-  public ResponseEntity<List<Team>> search(@RequestParam String pattern) {
+  @Operation(summary = "Search teams", description = "Finds all teams matching the specified search pattern")
+  public ResponseEntity<List<Team>> search(
+      @Parameter(description = "Search pattern to match against team fields", required = true) @RequestParam String pattern) {
     return ResponseEntity.ok(teamService.search(pattern));
   }
 
   @PutMapping("/{name}")
+  @Operation(summary = "Update a team", description = "Updates the information of an existing team by its name")
   public ResponseEntity<Team> updateTeam(
-    @PathVariable String name,
-    @Valid @RequestBody Team teamDetails
-  ) {
+      @PathVariable String name,
+      @Valid @RequestBody Team teamDetails) {
     return ResponseEntity.ok(teamService.updateTeam(name, teamDetails));
   }
 }

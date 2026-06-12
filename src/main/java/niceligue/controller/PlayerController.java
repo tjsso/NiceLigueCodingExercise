@@ -16,8 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+
 @RestController
 @RequestMapping("/api/players")
+@Tag(name = "Players", description = "Endpoints for managing players in the league")
 public class PlayerController {
 
     @Autowired
@@ -27,16 +33,20 @@ public class PlayerController {
     private PlayerTeamService playerTeamService;
 
     @GetMapping
+    @Operation(summary = "Get all players", description = "Retrieves a list of all registered players in the league")
     public List<Player> getAllPlayers() {
         return playerService.findAll();
     }
 
     @PostMapping
+    @Operation(summary = "Create a new player", description = "Registers a new player in the system", tags = {
+      "Players" })
     public ResponseEntity<Player> createPlayer(@RequestBody Player player) {
         return ResponseEntity.ok(playerService.save(player));
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get player by ID", description = "Retrieves the details of a specific player by their unique identifier")
     public ResponseEntity<Player> getPlayerById(@PathVariable Long id) {
         return playerService
             .findById(id)
@@ -45,6 +55,7 @@ public class PlayerController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update an existing player", description = "Updates the information of an existing player by their unique identifier")
     public ResponseEntity<Player> updatePlayer(
         @PathVariable Long id,
         @RequestBody Player playerDetails) {
@@ -52,6 +63,7 @@ public class PlayerController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a player", description = "Removes a player from the system, including their associations with all teams")
     public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
       if (playerService.existsById(id)) {
         playerTeamService.removePlayerFromAllTeams(id);
@@ -62,7 +74,9 @@ public class PlayerController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Player>> search(@RequestParam String name) {
+    @Operation(summary = "Search players by name", description = "Finds all players whose names contain the specified search term")
+    public ResponseEntity<List<Player>> search(
+      @Parameter(description = "The name fragment to search for", required = true) @RequestParam String name) {
         return ResponseEntity.ok(playerService.searchByNameContaining(name));
     }
 }
