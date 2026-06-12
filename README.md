@@ -1,5 +1,27 @@
-## Time taken to complete
-total: 12.5 hours
+## time taken 
+total: 13.5 hours
+
+## How to run and test this application
+
+To run and test this application, you have two main options:
+
+### Using `mvn spring-boot:run` and Swagger UI
+1. [Checkout project](https://github.com/tjsso/NiceLigueCodingExercise)
+2. open a terminal within project directory
+3. Run the following command in your terminal:
+   ```bash
+   mvn spring-boot:run
+   ```
+4. Once the application has started, navigate to the Swagger UI at:
+   https://localhost:8080/swagger-ui
+
+### Using GitHub Codespaces
+If this application is running via a GitHub Codespace, you can access the Swagger UI directly using the provided URL:
+[https://fictional-chainsaw-54qw949grw5cv4r6-8080.app.github.dev/swagger-ui/index.html](https://fictional-chainsaw-54qw949grw5cv4r6-8080.app.github.dev/swagger-ui/index.html)*
+
+*Double check URL via the github repository link. Possible it has updated/changed.
+
+---
 
 ## Thought process:
 
@@ -13,7 +35,7 @@ I knew Springboot has it's own database initialisation and management and so dec
 
 I had previously used H2 for prototyping in the past and used the boilerplate code from [here](https://www.baeldung.com/spring-boot-h2-database) to get started.
 
-Next I created the boilerplate PlayerRepository, TeamRepository, Domain Objects and Controllers.
+Next I created the boilerplate [PlayerRepository](src/main/java/niceligue/repository/PlayerRepository.java), [TeamRepository](src/main/java/niceligue/repository/TeamRepository.java), Domain Objects and Controllers.
 I know I needed Controllers to handle API calls. I was hoping to avoid a service layer to avoid complexity for such a simple design.
 
 I then followed a TDD approach by writing the following list:
@@ -33,12 +55,12 @@ I then followed a TDD approach by writing the following list:
 
 Code examples taken from [Medium article](https://medium.com/@premkamalosipalli/unit-testing-spring-boot-rest-apis-with-junit-and-mockito-4aa828be0d52)
 
-And wrote PlayerControllerTest and TeamControllerTest. All tests failed or errored to begin with (as expected).
+And wrote [PlayerControllerTest](src/test/java/niceligue/controller/PlayerControllerTest.java) and [TeamControllerTest](src/test/java/niceligue/controller/TeamControllerTest.java). All tests failed or errored to begin with (as expected).
 I focused on PlayerControllerTest first because it should be simpler, a player can or cannot be a part of a team.  
 This revealed pretty quickly that my Controller-Service combined layer plan was going to make things difficult because when deleting a Player we also have to remove their reference from any Team's they are apart of.
 
 ### Started implementing Service layer.
-created TeamService and PlayeService, however whilst trying to implement PlayerController.deletePlayer() I realised that it would be clearer to create a TeamPlayerService, this is a H2 in-memory table to handle the ManyToMany relationship. This service would be better placed to carry out functionality such as removing a Player from all the teams they are currently assigned too.
+created [TeamService](src/main/java/niceligue/service/TeamService.java) and [PlayerService](src/main/java/niceligue/service/PlayerService.java), however whilst trying to implement [PlayerController](src/main/java/niceligue/controller/PlayerController.java).deletePlayer() I realised that it would be clearer to create a [TeamPlayerService](src/main/java/niceligue/service/PlayerTeamService.java), this is a H2 in-memory table to handle the ManyToMany relationship. This service would be better placed to carry out functionality such as removing a Player from all the teams they are currently assigned too.
 
 ### Back to PlayerControllerTests
 I got all my tests to pass, aside from deletePlayer() because of my complicated Many-To-Many relationship.
@@ -66,7 +88,7 @@ After getting these tests working successfully. I returned to the brief and ackn
     
 2. Another that allows adding a team with or without associated players (all other fields are required).
 
-For 1., during my JUnit testing of my TeamControllerTest I realised that I needed @Transactional annotations in order to keep the data connection open for hibernate to load the lazy lists as requested. I also needed to return to my TeamController to add pagination and sorting, this was the least of my worries as i've had plenty of experience and knew how to set it up once I knew findAll() worked via JUnit test. 
+For 1., during my JUnit testing of my TeamControllerTest I realised that I needed @Transactional annotations in order to keep the data connection open for hibernate to load the lazy lists as requested. I also needed to return to my [TeamController](src/main/java/niceligue/controller/TeamController.java) to add pagination and sorting, this was the least of my worries as i've had plenty of experience and knew how to set it up once I knew findAll() worked via JUnit test.
 
 For 2., this was implemented from the start, I did add an @Valid to my Controller method to ensure that the validation annotations were called when something was not correct.
 
@@ -76,6 +98,11 @@ When thinking about how to run this software for testing/prototyping one main th
 
 How do we "host" the swagger UI however? The obvious answer is to run `mvn spring-boot:run` from within this codebase and then navigate to https://localhost:8080/swagger-ui
 Perhaps a better alternative; I have had multiple experiences of peers asking me to "test something out" for them and I find out it is hosted through github codespaces. I've known this functionality exists but never used it myself. I started by reading the github documentation and created a .devcontainer/devcontainer.json however this was proving to be a bit of a learning curve for myself in the limited time for this challenge and was not an effective use of my time. Therefore I utilsed an LLM to assist in getting this working (See LLM usage section below for more info).
+
+##
+
+After testing deployment via github codespaces I ran into an issue with CORS because spring boot by default only accepts incoming requests from `localhost`. 
+I have encountered this issue before and used [baeldung's guide](https://www.baeldung.com/spring-webflux-cors) to set `.allowedOriginPatterns("https://*.app.github.dev")`; This is enforcing security as it refuses connections from non github hosts.
 
 ## LLM (AI) usage
 The aims of this project are not to automatically generate code using an LLM. However in today's landscape it is hard to avoid them. Therefore this section highlights any specific usages of LLM "AI" to get me an answer.
