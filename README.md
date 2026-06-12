@@ -1,5 +1,5 @@
 ## time taken 
-total: 13.5 hours
+total: 15 hours
 
 ## How to run and test this application
 
@@ -20,6 +20,8 @@ If this application is running via a GitHub Codespace, you can access the Swagge
 [https://fictional-chainsaw-54qw949grw5cv4r6-8080.app.github.dev/swagger-ui/index.html](https://fictional-chainsaw-54qw949grw5cv4r6-8080.app.github.dev/swagger-ui/index.html)*
 
 *Double check URL via the github repository link. Possible it has updated/changed.
+
+I did experience another issue where the request URL was incorrect. For Github codespaces it was specifically being set to localhost:8080 which is not the host URL for github code spaces. I found the answer on [stack overflow](https://stackoverflow.com/questions/60625494/wrong-generated-server-url-in-springdoc-openapi-ui-swagger-ui-deployed-behin)
 
 ---
 
